@@ -1,6 +1,11 @@
 package net.mokatech.exceptioncontext;
 
+import net.mokatech.exceptioncontext.concurrent.BusinessContextAwareExecutorServiceDecorator;
 import net.mokatech.exceptioncontext.concurrent.BusinessContextAwareRunnableDecorator;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TestApi {
 
@@ -15,6 +20,12 @@ public class TestApi {
             e.printStackTrace();
             e.printContext();
         }
+
+        Util.delay(1);
+        test.methodLaunchingNewThread();
+
+        Util.delay(1);
+        test.methodUsingExecutorService();
     }
 
     private void method1(String foo) throws BusinessException {
@@ -29,30 +40,42 @@ public class TestApi {
     public void method2(String foo, int bar) throws BusinessException {
         BusinessContext.push(() -> "In method 2 with params " + foo + " and " + bar);
         try {
-            // Call a method that succeeds to show that its context is successfully pop()-ed from the context stack
-            method3a();
-            // Now call a dangerous mehod
-//            method3b();
+            methodThrowingBusinessException();
         } finally {
             BusinessContext.pop();
         }
     }
 
-    private void method3a() throws BusinessException {
-        BusinessContext.push(() -> "In method 3a");
+    private void methodThrowingBusinessException() throws BusinessException {
+        BusinessContext.push(() -> "In a method throwing BusinessException");
         try {
-            System.out.println("Doing serious stuff here");
+            throw new MyBusinessException("Oh noes ! A business problem !", false); // oops
+        } finally {
+            BusinessContext.pop();
+        }
+    }
+
+    private void methodLaunchingNewThread() {
+        BusinessContext.push(() -> "In a method launching a new thread");
+        try {
             new Thread(new BusinessContextAwareRunnableDecorator(new Job())).start();
         } finally {
             BusinessContext.pop();
         }
     }
 
-    private void method3b() throws BusinessException {
-        BusinessContext.push(() -> "In method 3b");
+    private void methodUsingExecutorService() {
+        BusinessContext.push(() -> "In a method using an ExecutorService");
         try {
-            System.out.println("Doing dangerous stuff here");
-            throw new MyBusinessException("Oh noes ! A business problem !", false); // oops
+            ExecutorService pool = Executors.newFixedThreadPool(1);
+            BusinessContextAwareExecutorServiceDecorator businessContextAwarePool = new BusinessContextAwareExecutorServiceDecorator(pool);
+            businessContextAwarePool.submit(new Job());
+            pool.shutdown();
+            try {
+                pool.awaitTermination(1, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         } finally {
             BusinessContext.pop();
         }

@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+/**
+ * <p>Decorator that wraps the {@code Runnable}s and {@code Callable}s passed to the given {@code ExecutorService} in
+ * business context-aware decorators (resp. in {@link BusinessContextAwareRunnableDecorator}s and
+ * {@link BusinessContextAwareCallableDecorator}s).
+ * <p>All methods are simply delegated to the underlying {@code ExecutorService}.
+ */
 public class BusinessContextAwareExecutorServiceDecorator implements ExecutorService {
 
     private final ExecutorService delegate;

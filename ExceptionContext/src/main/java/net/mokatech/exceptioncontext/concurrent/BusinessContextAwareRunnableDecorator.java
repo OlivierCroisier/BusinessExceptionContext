@@ -5,6 +5,10 @@ import net.mokatech.exceptioncontext.BusinessContext;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Decorator that sets the correct {@code BusinessContext} during the execution of the given {@code Runnable}, and then
+ * resets it to its previous value.
+ */
 public class BusinessContextAwareRunnableDecorator implements Runnable {
 
     private final Runnable delegate;

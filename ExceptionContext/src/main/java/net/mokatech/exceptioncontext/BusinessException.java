@@ -24,7 +24,7 @@ public class BusinessException extends Exception {
      */
     private static final ThreadLocal<Boolean> STACKTRACE_FLAG = new ThreadLocal<>();
     /** Whether this exception has captured a stacktrace */
-    private boolean hasStackTrace = STACKTRACE_FLAG.get();
+    private boolean withStackTrace = STACKTRACE_FLAG.get();
     /** The business context captured on exception construction */
     private final List<Supplier<String>> context = BusinessContext.get();
 
@@ -114,7 +114,7 @@ public class BusinessException extends Exception {
      * @return {@code true} if it has captured a stacktrace, {@code false} otherwise.
      */
     public boolean hasStackTrace() {
-        return hasStackTrace;
+        return withStackTrace;
     }
 
     /**

@@ -2,6 +2,14 @@ package net.mokatech.exceptioncontext;
 
 public class MyBusinessException extends BusinessException {
 
+    public MyBusinessException() {
+        super();
+    }
+
+    public MyBusinessException(boolean withStackTrace) {
+        super(withStackTrace);
+    }
+
     public MyBusinessException(String message) {
         super(message);
     }
@@ -26,11 +34,7 @@ public class MyBusinessException extends BusinessException {
         super(cause, withStackTrace);
     }
 
-    public MyBusinessException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public MyBusinessException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, boolean withStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace, withStackTrace);
+    public MyBusinessException(String message, Throwable cause, boolean enableSuppression, boolean withStackTrace) {
+        super(message, cause, enableSuppression, withStackTrace);
     }
 }

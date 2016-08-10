@@ -78,14 +78,9 @@ As stated above, stacktraces are expensive to generate.
 
 As part of the process of instanciating any exception, `Throwable`'s constructor ends up being called. One of its duties is to call the native `fillInStackTrace()` method, which is responsible for stopping the thread and walking all its stack to collect interesting data such as the class and method names, line numbers etc. As you can imagine, this puts quite a heavy burden on the JVM.
 
-So in the rare event when stacktraces are not needed, an interesting option is to override the `fillInStackTrace()` method with a no-op one.  
-This is what the `BusinessException` does by default ; the boolean parameter (`withStackTrace`) that some of its constructors accept allows to revert to the standart behaviour if needed.
-   
-That boolean poses interesting problems on its own.  
-Due to the way Java initialises class instances (first the parent hierarchy, then the class itself), by the time the overriden `fillInStackTrace()` method is called, the `withStackTrace` field still has its default value (`false`), and not yet its "real" value. This leads to the stacktrace generation being always skipped.
+So in the rare event when stacktraces are not needed, an interesting option is to override the `fillInStackTrace()` method with a no-op one, or to use `Throwable`'s constructor variant that accepts a boolean that controls the stacktrace generation.
 
-To value the `withStackTrace` field *before* calling the superclass' constructors, `BusinessException` implements a well-known ugly hack involving a `ThreadLocal` field and a static method wrapping some of the parameters passed to the superclass' constructor.  
- This of course, works only with superclasses accepting constructor parameters ; which is why the default no-arg constructor (which would call `Exception`'s no-arg constructor) is not implemented by `BusinessException`. 
+By default, `BusinessException`'s constructors use the latter to disable stacktrace generation, but the variants which accept a boolean parameter (`withStackTrace`) can be used to control that behaviour as needed.
  
 ### BusinessContextAspect
 
